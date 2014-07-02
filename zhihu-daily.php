@@ -22,7 +22,7 @@ function send_kindle_mail()
 {
     $zhihu_file = write_zhihu_file();
 
-    require './PHPMailer-master/PHPMailerAutoload.php';
+    require './PHPMailer/PHPMailerAutoload.php';
     $mail = new PHPMailer;
 
     $mail->isSMTP();                                      // Set mailer to use SMTP
