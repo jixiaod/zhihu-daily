@@ -66,8 +66,8 @@ function write_zhihu_file()
     *
     */
     foreach ($data['news'] as $key => $new) {
-        file_put_contents($zhihu_file, "{$key}#--------------------------------------------#\n",FILE_APPEND);
-        file_put_contents($zhihu_file, $new['title'], FILE_APPEND);   
+        $N = $key + 1;
+        file_put_contents($zhihu_file, "{$N}#{$new['title']}#\n",FILE_APPEND);
         $content = get_one_zhihu_new_content($new['url']);
         file_put_contents($zhihu_file, $content, FILE_APPEND);   
     }
