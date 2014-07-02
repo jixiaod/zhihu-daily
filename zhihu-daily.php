@@ -34,7 +34,7 @@ function send_kindle_mail()
 
     $mail->From = MAIL_FROM;
     $mail->FromName = 'zhihu-rss';
-    $mail->addAddress('ji.xiaod@gmail.com');               // Name is optional
+    $mail->addAddress(MAIL_ADD_ADDRESS);               // Name is optional
 
     $mail->addAttachment($zhihu_file);
     $mail->isHTML(true);                                  // Set email format to HTML
