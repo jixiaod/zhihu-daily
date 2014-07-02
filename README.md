@@ -2,6 +2,13 @@
 每天cron定时发送带有知乎日报的附件邮件到kindle邮箱，通过kindle自己的推送服务，达到在kindle上阅读知乎日报的功能。
 
 #如何使用？
+
+```shell
+    #git clone git@github.com:ttihgiesr/zhihu-daily.git
+    #cd zhihu-daily
+    #git submodule update --init --recursive
+```
+
 修改zhihu-daily.php头部的配置
 ```php
     define( 'MAIL_HOST', 'mail server');
