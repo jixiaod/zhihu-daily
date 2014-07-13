@@ -10,19 +10,21 @@
 * @date 2014-06-27
 */
 
-define( 'MAIL_HOST', 'mail server');
-define( 'MAIL_USERNAME', 'your send mail email');
-define( 'MAIL_PASSWORD', 'your email pass');
-define( 'MAIL_FROM', 'your display email');
-define( 'MAIL_ADD_ADDRESS', 'kindle email address');
+define( 'mail_host', 'mail server');
+define( 'mail_username', 'your send mail email');
+define( 'mail_password', 'your email pass');
+define( 'mail_from', 'your display email');
+define( 'mail_add_address', 'kindle email address');
 
-define( 'PATH_MAIL_ATTACHMENT', './mail_attachments/');
+define( 'PATH_MAIL_ATTACHMENT', '/var/tmp/');
+
+set_include_path(dirname(__FILE__) . '/PHPMailer/');
 
 function send_kindle_mail()
 {
     $zhihu_file = write_zhihu_file();
 
-    require './PHPMailer/PHPMailerAutoload.php';
+    require 'PHPMailerAutoload.php';
     $mail = new PHPMailer;
 
     $mail->isSMTP();                                      // Set mailer to use SMTP
@@ -55,7 +57,7 @@ function write_zhihu_file()
 {
     $data = latest_data();
 
-    $zhihu_file = PATH_MAIL_ATTACHMENT . $data['date'] . '.txt';
+    $zhihu_file = PATH_MAIL_ATTACHMENT . 'zhihu-daily-' . $data['date'] . '.txt';
     if ( file_exists($zhihu_file) ) {
         echo ">>log: delte exists attachment file.\n";
         unlink($zhihu_file);
