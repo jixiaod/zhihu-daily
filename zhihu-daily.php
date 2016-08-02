@@ -1,45 +1,46 @@
 <?PHP
 /**
-* @file zhihu-read.php
+* @file zhihu-daily.php
 * 
 * @brief  获取知乎日报并推送到kindle阅读器
 * Copyright(C) 2013-2016 Ji Gang, individual. or its affiliates. All Rights Reserved.
 * 
 * @version $Id$
 * @author tiger, ji.xiaod@gmail.com
-* @date 2014-06-27
+* @date 2016-08-02
 */
 
-define( 'mail_host', 'mail server');
-define( 'mail_username', 'your send mail email');
-define( 'mail_password', 'your email pass');
-define( 'mail_from', 'your display email');
-define( 'mail_add_address', 'kindle email address');
+define( 'MAIL_HOST', 'mail server'); // stmp 服务
+define( 'MAIL_USERNAME', 'your send mail email'); // 发送邮箱地址
+define( 'MAIL_PASSWORD', 'your email pass'); // 发送邮箱密码
+define( 'MAIL_FROM', 'your display email'); // 显示的邮箱来源
+define( 'MAIL_ADD_ADDRESS', 'kindle email address'); // kindle 邮箱地址
 
-define( 'PATH_MAIL_ATTACHMENT', '/var/tmp/');
+define( 'PATH_MAIL_ATTACHMENT', '/var/tmp/'); // 知乎新闻邮件附件临时文件路径
 
-set_include_path(dirname(__FILE__) . '/PHPMailer/');
+
+require('vendor/autoload.php');
 
 function send_kindle_mail()
 {
     $zhihu_file = write_zhihu_file();
+    echo ">>log: tmp mail file => $zhihu_file \n";
 
-    require 'PHPMailerAutoload.php';
     $mail = new PHPMailer;
 
-    $mail->isSMTP();                                      // Set mailer to use SMTP
-    $mail->Host = MAIL_HOST;  // Specify main and backup SMTP servers
-    $mail->SMTPAuth = true;                               // Enable SMTP authentication
-    $mail->Username = MAIL_USERNAME;                 // SMTP username
-    $mail->Password = MAIL_PASSWORD;                           // SMTP password
-    $mail->SMTPSecure = 'tls';                            // Enable encryption, 'ssl' also accepted
+    $mail->isSMTP();
+    $mail->Host = MAIL_HOST;
+    $mail->SMTPAuth = true;
+    $mail->Username = MAIL_USERNAME;
+    $mail->Password = MAIL_PASSWORD;
+    $mail->SMTPSecure = 'tls';
 
     $mail->From = MAIL_FROM;
     $mail->FromName = 'zhihu-rss';
-    $mail->addAddress(MAIL_ADD_ADDRESS);               // Name is optional
+    $mail->addAddress(MAIL_ADD_ADDRESS);
 
     $mail->addAttachment($zhihu_file);
-    $mail->isHTML(true);                                  // Set email format to HTML
+    $mail->isHTML(true);
 
     $mail->Subject = 'zhihu daily';
     $mail->Body    = 'This is zhihu daily news rss push.';
@@ -51,6 +52,8 @@ function send_kindle_mail()
     } else {
         echo ">>log: message has been sent.\n";
     }   
+
+    @unlink($zhihu_file);
 }
 
 function write_zhihu_file()
@@ -68,10 +71,13 @@ function write_zhihu_file()
     *
     */
     foreach ($data['news'] as $key => $new) {
-        $N = $key + 1;
-        file_put_contents($zhihu_file, "{$N}#{$new['title']}#\n",FILE_APPEND);
-        $content = get_one_zhihu_new_content($new['url']);
+
+        list($title, $content) = get_one_zhihu_new_content($new['url']);
+        file_put_contents($zhihu_file, "#{$title}#\n", FILE_APPEND);
         file_put_contents($zhihu_file, $content, FILE_APPEND);   
+        file_put_contents($zhihu_file, "\n============================================\n", FILE_APPEND);   
+        file_put_contents($zhihu_file, "\n==================Next======================\n", FILE_APPEND);   
+        file_put_contents($zhihu_file, "\n============================================\n", FILE_APPEND);   
     }
     echo ">>log: write file done.\n";
 
@@ -90,14 +96,20 @@ function get_one_zhihu_new_content($url)
     }
 
     echo ">>log: data json decode pending.\n";
+
     $arr_data = json_decode($json_data, true);
+
     if ( isset($data['body']) && empty($data['body']) ) {
         echo "!!error: json decode new body error, format body error.\n";
     }
 
-    $content= $arr_data['body'];
-    $content = htmlspecialchars_decode( strip_tags($content) );
-    return $content;
+    $title      = $arr_data['title'];
+    $content    = $arr_data['body'];
+    $content    = strip_tags($content);
+    $content    = htmlspecialchars_decode($content, ENT_QUOTES);
+    $content    = html_entity_decode($content);
+
+    return [$title, $content];
 }
 
 function latest_data() 
@@ -136,3 +148,4 @@ function get_url_contents($url)
 
 // run.
 send_kindle_mail();
+
