@@ -1,0 +1,15 @@
+{
+    "name": "jixiaod/zhihu-daily",
+    "type": "tool",
+    "description": "Send zhihu daily news to your kindle device by mail.",
+    "authors": [
+        {
+            "name": "Ji Gang",
+            "email": "ji.xiaod@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.0.0",
+        "phpmailer/phpmailer": "^5.2"
+    }
+}
